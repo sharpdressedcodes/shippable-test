@@ -16,8 +16,10 @@ services:
 
 before_script:
   - sudo apt-get update
-  - sudo php shippable-conf/composer-setup.php --install-dir=bin --filename=composer
-  - sudo mv shippable-conf/composer.phar /usr/local/bin/composer
+#  - sudo php shippable-conf/composer-setup.php --install-dir=bin --filename=composer
+#  - sudo mv shippable-conf/composer.phar /usr/local/bin/composer
+  - curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+  - sudo chown -R $USER:$USER ~/.composer
   - composer self-update -n
   - composer install
 
