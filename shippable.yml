@@ -16,14 +16,15 @@ services:
 
 before_script:
   - sudo apt-get update
+  - sudo php shippable-conf/composer-setup.php --install-dir=bin --filename=composer
+  - sudo mv shippable-conf/composer.phar /usr/local/bin/composer
   - composer self-update -n
-  - composer install --prefer-dist -n
+  - composer install
 
 script:
   - phpunit --log-junit shippable/testresults/junit.xml --coverage-xml shippable/codecoverage tests/ExampleTest.php
 
 after_script:
-  - cp -r ./app/logs shippable/logs
 
 ## Optional: select the node pool or node pools you want to run this job on,if different from default
 #runtime:
