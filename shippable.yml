@@ -21,14 +21,17 @@ before_script:
 #  - curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
 #  - sudo chown -R $USER:$USER ~/.composer
 #  - composer self-update -n
-  #- mkdir -p shippable/codecoverage
-  #- mkdir -p shippable/testresults
+  - mkdir -p ./shippable/codecoverage
+  - mkdir -p ./shippable/testresults
   - composer install
   - echo "==========================="
   - pwd
+  - ls -la
+  - ls -la ./test
+
 
 script:
-  - phpunit --log-junit shippable/testresults/junit.xml --coverage-xml shippable/codecoverage ./tests/ExampleTest.php
+  - phpunit --log-junit ./shippable/testresults/junit.xml --coverage-xml ./shippable/codecoverage ./test/ExampleTest.php
 
 after_script:
 
