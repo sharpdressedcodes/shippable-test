@@ -1,7 +1,7 @@
 language: php
 
 php:
-  - 7.2.15
+  - 7.2 #.15
 
 archive: true
 
@@ -18,9 +18,9 @@ before_script:
   - sudo apt-get update
 #  - sudo php shippable-conf/composer-setup.php --install-dir=bin --filename=composer
 #  - sudo mv shippable-conf/composer.phar /usr/local/bin/composer
-  - curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
-  - sudo chown -R $USER:$USER ~/.composer
-  - composer self-update -n
+#  - curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+#  - sudo chown -R $USER:$USER ~/.composer
+#  - composer self-update -n
   - composer install
 
 script:
