@@ -1,0 +1,112 @@
+language: php
+
+php:
+  - 7.2
+
+branches:
+  only:
+    - master
+    - feature/*
+    - fix/*
+
+services:
+  - mysql
+
+before_script:
+  - sudo apt-get update
+  - sudo apt-get install nginx
+  - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
+  - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
+  - sudo cp -f shippable-conf/site-nginx.conf /etc/nginx/sites-enabled/site-nginx.conf
+  - sudo sed -e "s?%BUILD_DIR%?$(pwd)?g" --in-place /etc/nginx/sites-enabled/site-nginx.conf
+  - sudo service nginx start
+  - sudo php shippable-conf/composer-setup.php --install-dir=bin --filename=composer
+  - sudo mv shippable-conf/composer.phar /usr/local/bin/composer
+  - composer install
+
+script:
+  - phpunit --log-junit shippable/testresults/junit.xml --coverage-xml shippable/codecoverage tests/ExampleTest.php
+
+after_script:
+  - sudo service nginx stop
+
+## Optional: select the node pool or node pools you want to run this job on,if different from default
+#runtime:
+#
+#services:
+#  - #any supported service
+#
+#depth: #postive integer
+#
+#gitConfig:
+#  - #git config 1
+#  - #git config 2
+#
+#vote:
+#  on_success:
+#    Verified: 1
+#    Code-Review: 2
+#  on_failure:
+#    Verified: -1
+#    Code-Review: -2
+#
+#env:
+#  - #env1=foo
+#  - #env2=bar
+#
+#matrix:
+#
+#build:
+#
+#  pre_ci:
+#    - echo "hello pre ci..."
+#
+#  pre_ci_boot:
+#    image_name:
+#    image_tag:
+#    pull:
+#    options:
+#
+#  ci:
+#    - #command1
+#    - #command2
+#    - echo "hello ci..."
+#
+#  post_ci:
+#    - #command1
+#    - #command2
+#    - echo "hello post ci..."
+#
+#  on_success:
+#    - #command1
+#    - #command2
+#    - echo "on_success triggered..."
+#
+#  on_failure:
+#    - #command1
+#    - #command2
+#    - echo "on_failure triggered..."
+#
+#  always:
+#    - #command1
+#    - #command2
+#    - echo "always triggered..."
+#
+#  cache:
+#  cache_dir_list:
+#    - #dir1
+#  push:
+#    - #command1
+#
+#integrations:
+# notifications:
+#   - integrationName:
+#     type:
+#     recipients:
+#       - #recp1
+#       - #recp2
+#
+#  hub:
+#    - integrationName:
+#      type:
+#      agent_only:

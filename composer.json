@@ -1,0 +1,13 @@
+{
+    "name": "sharpdressedcodes/shippable-test",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Greg Kappatos",
+            "email": "sharpdressedcodes@users.noreply.github.com"
+        }
+    ],
+    "require": {
+        "phpunit/phpunit": "^8.1"
+    }
+}
