@@ -3,6 +3,8 @@ language: php
 php:
   - 7.2.15
 
+archive: true
+
 branches:
   only:
     - master
@@ -13,22 +15,24 @@ services:
   - mysql
 
 before_script:
-  - sudo apt-get update
-  - sudo apt-get install nginx
-  - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
-  - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
-  - sudo cp -f shippable-conf/site-nginx.conf /etc/nginx/sites-enabled/site-nginx.conf
-  - sudo sed -e "s?%BUILD_DIR%?$(pwd)?g" --in-place /etc/nginx/sites-enabled/site-nginx.conf
-  - sudo service nginx start
-  - sudo php shippable-conf/composer-setup.php --install-dir=bin --filename=composer
-  - sudo mv shippable-conf/composer.phar /usr/local/bin/composer
-  - composer install
+#  - sudo apt-get update
+#  - sudo apt-get install nginx
+#  - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
+#  - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
+#  - sudo cp -f shippable-conf/site-nginx.conf /etc/nginx/sites-enabled/site-nginx.conf
+#  - sudo sed -e "s?%BUILD_DIR%?$(pwd)?g" --in-place /etc/nginx/sites-enabled/site-nginx.conf
+#  - sudo service nginx start
+#  - sudo php shippable-conf/composer-setup.php --install-dir=bin --filename=composer
+#  - sudo mv shippable-conf/composer.phar /usr/local/bin/composer
+  - composer self-update -n
+  - composer install --prefer-dist -n
 
 script:
   - phpunit --log-junit shippable/testresults/junit.xml --coverage-xml shippable/codecoverage tests/ExampleTest.php
 
 after_script:
-  - sudo service nginx stop
+#  - sudo service nginx stop
+  - cp -r ./app/logs shippable/logs
 
 ## Optional: select the node pool or node pools you want to run this job on,if different from default
 #runtime:
