@@ -37,21 +37,13 @@ build:
   cache_dir_list:
     - $SHIPPABLE_BUILD_DIR/vendor
 
-  pre_ci:
-    - sudo apt-get update
-    - sudo apt-get install nginx
-    - mkdir -p $COVERAGE_DIR $RESULTS_DIR
-  #  - mkdir -p ./shippable/codecoverage ./shippable/testresults
-  #  - mysql -e "CREATE DATABASE $SYMFONY__ENV__DATABASE_NAME"
-#    - composer self-update -n
-#    - composer install
-#    - pwd
-
   ci:
+  - sudo apt-get update
+  - sudo apt-get install nginx
+  - mkdir -p $COVERAGE_DIR $RESULTS_DIR
   - composer self-update -n
   - composer install
   - pwd
-  - echo $USER
   - echo $BRANCH_NAME
   - echo $COVERAGE_DIR
   - echo $RESULTS_DIR
