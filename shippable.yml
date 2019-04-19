@@ -43,11 +43,14 @@ build:
     - mkdir -p $COVERAGE_DIR $RESULTS_DIR
   #  - mkdir -p ./shippable/codecoverage ./shippable/testresults
   #  - mysql -e "CREATE DATABASE $SYMFONY__ENV__DATABASE_NAME"
-    - composer self-update -n
-    - composer install
-    - pwd
+#    - composer self-update -n
+#    - composer install
+#    - pwd
 
   ci:
+  - composer self-update -n
+  - composer install
+  - pwd
   - echo $USER
   - echo $BRANCH_NAME
   - echo $COVERAGE_DIR
