@@ -1,8 +1,7 @@
 language: php
 
-php:
+php: # Caution: If you add a PATCH number (eg: 7.2.15), this will build php from source, which will take around 15 minutes.
   - 7.2
-  # Caution: If you add a PATCH number (eg: 7.2.15), this will build php from source, which will take around 15 minutes.
 
 archive: true
 sudo: false
@@ -11,38 +10,34 @@ branches:
   only:
     - master
 
-env:
-  global:
-    - APP_KEY=shippable-test
-    - BRANCH_NAME="$(sed 's/\//-/g' <<< $BRANCH).$BUILD_NUMBER" # need to replace '/' in the branch name with '-'
-    - COVERAGE_DIR=./shippable/codecoverage
-    - RESULTS_DIR=./shippable/testresults
-    - CI_NAME="shippable"
-    - CI_BUILD_NUMBER="$BUILD_NUMBER"
-    - CI_BUILD_URL="$BUILD_URL"
-    - CI_BRANCH="$BRANCH"
-    - CI_PULL_REQUEST="$PULL_REQUEST"
+#env:
+#  global:
+#    - APP_KEY=shippable-test
+#    - BRANCH_NAME="$(sed 's/\//-/g' <<< $BRANCH).$BUILD_NUMBER" # Replace '/' in the branch name with '-'
+#    - CI_NAME="shippable"
+#    - CI_BUILD_NUMBER="$BUILD_NUMBER"
+#    - CI_BUILD_URL="$BUILD_URL"
+#    - CI_BRANCH="$BRANCH"
+#    - CI_PULL_REQUEST="$PULL_REQUEST"
+
+services: # http://docs.shippable.com/ci/services-overview/
+  - mysql
 
 before_install:
   - echo "xdebug.max_nesting_level = 1000" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  # Enable access to environment variables
-  - echo 'variables_order = "EGPCS"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo 'variables_order = "EGPCS"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini # Enable access to environment variables
 
-services:
-  - mysql
-
-build:
+build: # http://docs.shippable.com/ci/php-continuous-integration/
   cache: true
   cache_dir_list:
     - $SHIPPABLE_BUILD_DIR/vendor
 
   ci:
-    - sudo apt-get update
-    - sudo apt-get install nginx
-    - mkdir -p $COVERAGE_DIR $RESULTS_DIR
-    - composer self-update -n
-    - composer install
-    - phpunit --configuration ./.phpunit.xml --log-junit $RESULTS_DIR/junit.xml --coverage-xml $COVERAGE_DIR
+    - shippable_retry sudo apt-get update
+    - shippable_retry sudo apt-get install nginx
+    - shippable_retry composer self-update -n
+    - shippable_retry composer install
+    - composer run-script test:unit
 
   on_success:
     - echo "build:on_success run"
