@@ -35,6 +35,7 @@ before_script:
   - composer self-update -n
   - composer install
   - pwd
+  - nginx -v
 
 script:
 #  - phpunit --configuration ./.phpunit.xml --log-junit ./shippable/testresults/junit.xml --coverage-xml ./shippable/codecoverage
