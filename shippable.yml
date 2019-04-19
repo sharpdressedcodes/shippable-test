@@ -1,7 +1,9 @@
 language: php
 
 php:
-  - 7.2 #.15
+  - 7.2
+  # Caution: If you add a PATCH number (eg: 7.2.15), this will
+  # build php from source, which will take around 15 minutes.
 
 archive: true
 
@@ -16,22 +18,15 @@ services:
 
 before_script:
   - sudo apt-get update
-#  - sudo php shippable-conf/composer-setup.php --install-dir=bin --filename=composer
-#  - sudo mv shippable-conf/composer.phar /usr/local/bin/composer
-#  - curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
-#  - sudo chown -R $USER:$USER ~/.composer
-#  - composer self-update -n
-  - mkdir -p ./shippable/codecoverage
-  - mkdir -p ./shippable/testresults
+  - mkdir -p ./shippable/codecoverage ./shippable/testresults
+  - composer self-update -n
   - composer install
   - echo "==========================="
   - pwd
-  - ls -la
-  - ls -la ./test
-
+  - echo $USER
 
 script:
-  - phpunit --log-junit ./shippable/testresults/junit.xml --coverage-xml ./shippable/codecoverage ./test/ExampleTest.php
+  - phpunit --log-junit ./shippable/testresults/junit.xml --coverage-xml ./shippable/codecoverage --stop-on-error --verbose --colors ./test/
 
 after_script:
 
