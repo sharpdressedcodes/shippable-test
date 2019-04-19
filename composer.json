@@ -1,13 +1,20 @@
 {
-    "name": "sharpdressedcodes/shippable-test",
-    "type": "project",
-    "authors": [
-        {
-            "name": "Greg Kappatos",
-            "email": "sharpdressedcodes@users.noreply.github.com"
-        }
-    ],
-    "require": {
-        "phpunit/phpunit": "^8.1"
+  "name": "sharpdressedcodes/shippable-test",
+  "type": "project",
+  "authors": [
+    {
+      "name": "Greg Kappatos",
+      "email": "sharpdressedcodes@users.noreply.github.com"
     }
+  ],
+  "scripts": {
+    "clean": "rm -rf ./coverage ./junit.xml ./.phpunit.result.cache",
+    "test:unit": [
+      "@clean",
+      "phpunit --configuration ./.phpunit.xml --log-junit ./junit.xml --coverage-xml ./coverage"
+    ]
+  },
+  "require": {
+    "phpunit/phpunit": "^8.1"
+  }
 }

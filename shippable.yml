@@ -1,117 +1,49 @@
 language: php
 
-php:
-  - 7.2 #.15
+php: # Caution: If you add a PATCH number (eg: 7.2.15), this will build php from source, which will take around 15 minutes.
+  - 7.2
 
 archive: true
+sudo: false
 
 branches:
   only:
     - master
-    - feature/*
-    - fix/*
 
-services:
+#env:
+#  global:
+#    - APP_KEY=shippable-test
+#    - BRANCH_NAME="$(sed 's/\//-/g' <<< $BRANCH).$BUILD_NUMBER" # Replace '/' in the branch name with '-'
+#    - CI_NAME="shippable"
+#    - CI_BUILD_NUMBER="$BUILD_NUMBER"
+#    - CI_BUILD_URL="$BUILD_URL"
+#    - CI_BRANCH="$BRANCH"
+#    - CI_PULL_REQUEST="$PULL_REQUEST"
+
+services: # http://docs.shippable.com/ci/services-overview/
   - mysql
 
-before_script:
-  - sudo apt-get update
-#  - sudo php shippable-conf/composer-setup.php --install-dir=bin --filename=composer
-#  - sudo mv shippable-conf/composer.phar /usr/local/bin/composer
-#  - curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
-#  - sudo chown -R $USER:$USER ~/.composer
-#  - composer self-update -n
-  - mkdir -p ./shippable/codecoverage
-  - mkdir -p ./shippable/testresults
-  - composer install
-  - echo "==========================="
-  - pwd
-  - ls -la
-  - ls -la ./test
+before_install:
+  - echo "xdebug.max_nesting_level = 1000" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - echo 'variables_order = "EGPCS"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini # Enable access to environment variables
 
+build: # http://docs.shippable.com/ci/php-continuous-integration/
+  cache: true
+  cache_dir_list:
+    - $SHIPPABLE_BUILD_DIR/vendor
 
-script:
-  - phpunit --log-junit ./shippable/testresults/junit.xml --coverage-xml ./shippable/codecoverage ./test/ExampleTest.php
+  ci:
+    - shippable_retry sudo apt-get update
+    - shippable_retry sudo apt-get install nginx
+    - shippable_retry composer self-update -n
+    - shippable_retry composer install
+    - composer run-script test:unit
 
-after_script:
+  on_success:
+    - echo "build:on_success run"
 
-## Optional: select the node pool or node pools you want to run this job on,if different from default
-#runtime:
-#
-#services:
-#  - #any supported service
-#
-#depth: #postive integer
-#
-#gitConfig:
-#  - #git config 1
-#  - #git config 2
-#
-#vote:
-#  on_success:
-#    Verified: 1
-#    Code-Review: 2
-#  on_failure:
-#    Verified: -1
-#    Code-Review: -2
-#
-#env:
-#  - #env1=foo
-#  - #env2=bar
-#
-#matrix:
-#
-#build:
-#
-#  pre_ci:
-#    - echo "hello pre ci..."
-#
-#  pre_ci_boot:
-#    image_name:
-#    image_tag:
-#    pull:
-#    options:
-#
-#  ci:
-#    - #command1
-#    - #command2
-#    - echo "hello ci..."
-#
-#  post_ci:
-#    - #command1
-#    - #command2
-#    - echo "hello post ci..."
-#
-#  on_success:
-#    - #command1
-#    - #command2
-#    - echo "on_success triggered..."
-#
-#  on_failure:
-#    - #command1
-#    - #command2
-#    - echo "on_failure triggered..."
-#
-#  always:
-#    - #command1
-#    - #command2
-#    - echo "always triggered..."
-#
-#  cache:
-#  cache_dir_list:
-#    - #dir1
-#  push:
-#    - #command1
-#
-#integrations:
-# notifications:
-#   - integrationName:
-#     type:
-#     recipients:
-#       - #recp1
-#       - #recp2
-#
-#  hub:
-#    - integrationName:
-#      type:
-#      agent_only:
+  on_failure:
+    - echo "build:on_failure run"
+
+  always:
+    - echo "build:always run"
