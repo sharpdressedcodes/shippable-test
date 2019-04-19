@@ -1,0 +1,42 @@
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/6.3/phpunit.xsd"
+    backupGlobals="true"
+    backupStaticAttributes="false"
+    bootstrap="./vendor/autoload.php"
+    cacheTokens="false"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    forceCoversAnnotation="false"
+    processIsolation="false"
+    stopOnError="true"
+    stopOnFailure="true"
+    stopOnIncomplete="false"
+    stopOnSkipped="false"
+    stopOnRisky="false"
+    timeoutForSmallTests="1"
+    timeoutForMediumTests="10"
+    timeoutForLargeTests="60"
+    verbose="true">
+        <!-- ... -->
+    <testsuites>
+        <testsuite name="My Test Suite">
+            <directory>./test</directory>
+            <!--<directory>/test/*Test.php</directory>-->
+            <!--<file>/path/to/MyTest.php</file>-->
+            <!--<exclude>/path/to/exclude</exclude>-->
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./test</directory>
+            <!--<file>/path/to/file</file>-->
+            <!--<exclude>
+                <directory suffix=".php">/path/to/files</directory>
+                <file>/path/to/file</file>
+            </exclude>-->
+        </whitelist>
+    </filter>
+</phpunit>

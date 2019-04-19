@@ -21,12 +21,10 @@ before_script:
   - mkdir -p ./shippable/codecoverage ./shippable/testresults
   - composer self-update -n
   - composer install
-  - echo "==========================="
   - pwd
-  - echo $USER
 
 script:
-  - phpunit --log-junit ./shippable/testresults/junit.xml --coverage-xml ./shippable/codecoverage --stop-on-error --verbose --colors ./test/
+  - phpunit --configuration ./.phpunit.xml --log-junit ./shippable/testresults/junit.xml --coverage-xml ./shippable/codecoverage
 
 after_script:
 
