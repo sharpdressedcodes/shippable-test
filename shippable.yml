@@ -2,22 +2,27 @@ language: php
 
 php:
   - 7.2
-  # Caution: If you add a PATCH number (eg: 7.2.15), this will
-  # build php from source, which will take around 15 minutes.
+  # Caution: If you add a PATCH number (eg: 7.2.15), this will build php from source, which will take around 15 minutes.
 
 archive: true
+sudo: false
 
 branches:
   only:
     - master
-#    - feature/*
-#    - fix/*
 
 env:
   global:
     - APP_STUBBED=true
     - APP_KEY=shippable-test
     - BRANCH_NAME="$(sed 's/\//-/g' <<< $BRANCH).$BUILD_NUMBER" # need to replace '/' in the branch name with '-'
+    - COVERAGE_DIR=./shippable/codecoverage
+    - RESULTS_DIR=./shippable/testresults
+    - CI_NAME="shippable"
+    - CI_BUILD_NUMBER="$BUILD_NUMBER"
+    - CI_BUILD_URL="$BUILD_URL"
+    - CI_BRANCH="$BRANCH"
+    - CI_PULL_REQUEST="$PULL_REQUEST"
 
 before_install:
     - echo "xdebug.max_nesting_level = 1000" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
@@ -26,30 +31,29 @@ before_install:
 
 services:
   - mysql
-  - nginx
-
-before_script:
-  - sudo apt-get update
-  - mkdir -p ./shippable/codecoverage ./shippable/testresults
-#  - mysql -e "CREATE DATABASE $SYMFONY__ENV__DATABASE_NAME"
-  - composer self-update -n
-  - composer install
-  - pwd
-  - nginx -v
-
-script:
-#  - phpunit --configuration ./.phpunit.xml --log-junit ./shippable/testresults/junit.xml --coverage-xml ./shippable/codecoverage
-  - echo "script run"
-
-after_script:
-  - echo "after_script run"
 
 build:
   cache: true
   cache_dir_list:
     - $SHIPPABLE_BUILD_DIR/vendor
+
+  pre_ci:
+    - sudo apt-get update
+    - sudo apt-get install nginx
+    - mkdir -p $COVERAGE_DIR $RESULTS_DIR
+  #  - mkdir -p ./shippable/codecoverage ./shippable/testresults
+  #  - mysql -e "CREATE DATABASE $SYMFONY__ENV__DATABASE_NAME"
+    - composer self-update -n
+    - composer install
+    - pwd
+
   ci:
-    - echo "build:ci run"
+  - echo $USER
+  - echo $BRANCH_NAME
+  - echo $COVERAGE_DIR
+  - echo $RESULTS_DIR
+  - phpunit --configuration ./.phpunit.xml --log-junit $RESULTS_DIR/junit.xml --coverage-xml $COVERAGE_DIR
+#    - echo "build:ci run"
 #    - mkdir -p ./shippable/testresults ./shippable/codecoverage ./shippable/buildoutput
 #    - cd src
 #    - npm install
@@ -59,8 +63,9 @@ build:
 #    - ./node_modules/.bin/babel-istanbul report cobertura --dir  ./../shippable/codecoverage/
 #    - if [ "$IS_PULL_REQUEST" == false ]; then NODE_ENV=production npm run build; fi
 #    - cd ..
-  push:
-   - echo "build:push run"
+
+#  push:
+#   - echo "build:push run"
 
   on_success:
     - echo "build:on_success run"
