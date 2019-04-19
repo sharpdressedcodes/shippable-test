@@ -10,101 +10,62 @@ archive: true
 branches:
   only:
     - master
-    - feature/*
-    - fix/*
+#    - feature/*
+#    - fix/*
+
+env:
+  global:
+    - APP_STUBBED=true
+    - APP_KEY=shippable-test
+    - BRANCH_NAME="$(sed 's/\//-/g' <<< $BRANCH).$BUILD_NUMBER" # need to replace '/' in the branch name with '-'
+
+before_install:
+    - echo "xdebug.max_nesting_level = 1000" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+    # Enable access to environment variables
+    - echo 'variables_order = "EGPCS"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 services:
   - mysql
+  - nginx
 
 before_script:
   - sudo apt-get update
   - mkdir -p ./shippable/codecoverage ./shippable/testresults
+#  - mysql -e "CREATE DATABASE $SYMFONY__ENV__DATABASE_NAME"
   - composer self-update -n
   - composer install
   - pwd
 
 script:
-  - phpunit --configuration ./.phpunit.xml --log-junit ./shippable/testresults/junit.xml --coverage-xml ./shippable/codecoverage
+#  - phpunit --configuration ./.phpunit.xml --log-junit ./shippable/testresults/junit.xml --coverage-xml ./shippable/codecoverage
+  - echo "script run"
 
 after_script:
+  - echo "after_script run"
 
-## Optional: select the node pool or node pools you want to run this job on,if different from default
-#runtime:
-#
-#services:
-#  - #any supported service
-#
-#depth: #postive integer
-#
-#gitConfig:
-#  - #git config 1
-#  - #git config 2
-#
-#vote:
-#  on_success:
-#    Verified: 1
-#    Code-Review: 2
-#  on_failure:
-#    Verified: -1
-#    Code-Review: -2
-#
-#env:
-#  - #env1=foo
-#  - #env2=bar
-#
-#matrix:
-#
-#build:
-#
-#  pre_ci:
-#    - echo "hello pre ci..."
-#
-#  pre_ci_boot:
-#    image_name:
-#    image_tag:
-#    pull:
-#    options:
-#
-#  ci:
-#    - #command1
-#    - #command2
-#    - echo "hello ci..."
-#
-#  post_ci:
-#    - #command1
-#    - #command2
-#    - echo "hello post ci..."
-#
-#  on_success:
-#    - #command1
-#    - #command2
-#    - echo "on_success triggered..."
-#
-#  on_failure:
-#    - #command1
-#    - #command2
-#    - echo "on_failure triggered..."
-#
-#  always:
-#    - #command1
-#    - #command2
-#    - echo "always triggered..."
-#
-#  cache:
-#  cache_dir_list:
-#    - #dir1
-#  push:
-#    - #command1
-#
-#integrations:
-# notifications:
-#   - integrationName:
-#     type:
-#     recipients:
-#       - #recp1
-#       - #recp2
-#
-#  hub:
-#    - integrationName:
-#      type:
-#      agent_only:
+build:
+  cache: true
+  cache_dir_list:
+    - $SHIPPABLE_BUILD_DIR/vendor
+  ci:
+    - echo "build:ci run"
+#    - mkdir -p ./shippable/testresults ./shippable/codecoverage ./shippable/buildoutput
+#    - cd src
+#    - npm install
+#    - echo "module.exports={buildNumber:'$BRANCH_NAME'};" > version.js
+#    - cat version.js
+#    - npm run test:ci
+#    - ./node_modules/.bin/babel-istanbul report cobertura --dir  ./../shippable/codecoverage/
+#    - if [ "$IS_PULL_REQUEST" == false ]; then NODE_ENV=production npm run build; fi
+#    - cd ..
+  push:
+   - echo "build:push run"
+
+  on_success:
+    - echo "build:on_success run"
+
+  on_failure:
+    - echo "build:on_failure run"
+
+  always:
+    - echo "build:always run"
